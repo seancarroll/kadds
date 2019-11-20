@@ -17,9 +17,9 @@ Some secondary features to explore:
 
 ## Use Case
 
-Primary use case I'm investigating is distributing data from shared enterprise systems to downstream systems and companies. 
-Most of these source systems are relational data stores (e.g. Oracle) with thousands of tables. 
-In some instances this data comes out of the source system as change data capture events but platform should be able to support any number of source systems as well as both push and pull.
+Primary use case I'm investigating is distributing data from shared enterprise systems to downstream systems / companies. 
+Most of these source systems are relational data stores (e.g. Oracle) with hundreds to thousands of tables. 
+In some instances this data comes out of the source system as change data capture events but the platform should be able to support any number of source systems as well as both push and pull.
 
 
 ## Research
@@ -54,3 +54,26 @@ In some instances this data comes out of the source system as change data captur
 * http://www.pravega.io/
 * https://streamsets.com/
 * https://github.com/awslabs/deequ
+* https://delta.io/
+
+## Thoughts
+
+I really like both Pulsar's and Pravega's use of tierd storage to S3. 
+Based on the Pulsar docs I've read it looks like you confgure Pulsar to offload to a single bucket. 
+My requirement for a multi-tenant environment is be able to offload to a separate S3 bucket based on tenant. 
+Furthermore, I would like to control S3 location / key based on namespace and potentially ledger name. 
+I'm also potentially interested to see if there might be a way to incorporate Delta Lake as part of the offload to S3. 
+Potentially could allow a couple of different format options (parquet, json, avro, orc). 
+The offload would then be the foundation of an S3 data lake. 
+Given index files are part of the ofload, I need to determine if we can exclude files from being part of the data catalog. 
+
+Pulsar IO looks good and looks similar to kafka connect. 
+This is something that we'll need as well.
+
+I'm still looking at how to incorporate data quality gates / check outs as a first class citizen. 
+Need to think through how to reprocess things in error, how to notify down stream systems, etc
+
+Still need to work through how onboarding a new down stream system would occur. 
+Essentially, I want to be able to spin up something to process the ledger from the beginning and once its catch up to process normally. 
+Perhaps everything is its own subscription. 
+Where does the configuration live for how to partition data?
