@@ -66,6 +66,9 @@ I'm also potentially interested to see if there might be a way to incorporate De
 Potentially could allow a couple of different format options (parquet, json, avro, orc). 
 The offload would then be the foundation of an S3 data lake. 
 Given index files are part of the ofload, I need to determine if we can exclude files from being part of the data catalog. 
+Given one of the primary uses cases is change data capture (CDC) we'll want the ability to be able to keep point it time (PIT) snapshots/tables or current view. 
+Similarly, we'll want to support slowly changing data (SCD) aka type 2 tables where which require updating existing rows to mark previous values of keys as old, and the inserting the new rows as the latest values. 
+The nice thing about Delta Lake is that it has merge functionality as a first class citizen.
 
 Pulsar IO looks good and looks similar to kafka connect. 
 This is something that we'll need as well.
