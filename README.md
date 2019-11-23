@@ -55,6 +55,10 @@ In some instances this data comes out of the source system as change data captur
 * https://streamsets.com/
 * https://github.com/awslabs/deequ
 * https://delta.io/
+* https://streaml.io/blog/eda-simple-event-processing
+* https://streaml.io/blog/eda-event-processing-design-patterns-with-pulsar-functions
+* https://pulsar.apache.org/docs/en/functions-state/
+
 
 ## Thoughts
 
@@ -70,6 +74,10 @@ Given one of the primary uses cases is change data capture (CDC) we'll want the 
 Similarly, we'll want to support slowly changing data (SCD) aka type 2 tables where which require updating existing rows to mark previous values of keys as old, and the inserting the new rows as the latest values. 
 The nice thing about Delta Lake is that it has merge functionality as a first class citizen.
 
+Apache Pulsar will allow offloading to bucket based off namespace (https://github.com/apache/pulsar/pull/4739/files). 
+Need to take a closer look at the specifics to see if it matches what we need. 
+I should also look at writing a custom offloader that uses Delta Lake.
+
 Pulsar IO looks good and looks similar to kafka connect. 
 This is something that we'll need as well.
 
@@ -80,3 +88,13 @@ Still need to work through how onboarding a new down stream system would occur.
 Essentially, I want to be able to spin up something to process the ledger from the beginning and once its catch up to process normally. 
 Perhaps everything is its own subscription. 
 Where does the configuration live for how to partition data?
+
+From what I see producers in Apache pulsar are tied to a specific topics. 
+I dont see a way to dynamically route messages to different topics using a single producer. 
+It appears that Apache Pular Functions handles this scenario for event processing. 
+Per this doc (https://streaml.io/blog/eda-simple-event-processing) Pulsar Functions can publish results to one or more output topics and an example can be found here https://streaml.io/blog/eda-event-processing-design-patterns-with-pulsar-functions. 
+Looking at the implementation for how its achieved via Apache Pulsar Functions context, its what you would think. 
+Within ContextImpl.java they have a map `private Map<String, Producer<?>> publishProducers;` 
+
+Apache Pulsar uses Bookkeeper table service for storing state for functions. 
+I need to look more at Bookkeeper table service but looks like a KV store.
